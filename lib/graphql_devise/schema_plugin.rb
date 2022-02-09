@@ -77,10 +77,12 @@ module GraphqlDevise
 
     def authenticate_option(field, trace_data)
       auth_required = if trace_data[:context]
-        field.metadata[:authenticate]
-      else
-        field.graphql_definition.metadata[:authenticate]
-      end
+                        field.metadata[:authenticate]
+                      elsif field.respond_to?(:authenticate)
+                        field.authenticate.is_a?(Array) ? field.authenticate.first : false
+                      else
+                        field.graphql_definition.metadata[:authenticate]
+                      end
 
       auth_required.nil? ? @authenticate_default : auth_required
     end
